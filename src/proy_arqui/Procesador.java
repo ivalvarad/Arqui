@@ -1,16 +1,6 @@
 package proy_arqui;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Iva
- */
- public class Procesador extends Thread {
+public class Procesador extends Thread {
     
     //COLUMNAS EN CACHE
     private final int ID = 0;
