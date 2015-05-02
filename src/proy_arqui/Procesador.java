@@ -12,6 +12,8 @@ package proy_arqui;
  */
  public class Procesador extends Thread {
     
+    private static Multiprocesador myMp;
+    
     //COLUMNAS EN CACHE
     private final int ID = 0;
     private final int EST = 1;
@@ -29,6 +31,10 @@ package proy_arqui;
     private int estCache[][] = new int[4][2]; 
     //8bloques*4 = 32 palabras ---> 32palabras*4 = 128 direcciones de palabras
     private int dmem[] = new int[32]; // memoria de datos compartida (8 bloques, cada uno con 4 palabras, cada palabra 4 bytes)
+    
+    public Procesador(Multiprocesador mp){
+        myMp = mp;
+    }
     
     //RX, n(RY)
     //Rx <- M(n + (Ry))
