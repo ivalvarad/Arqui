@@ -28,12 +28,13 @@ public class Multiprocesador {
     }
     
     public void verInstrucciones(){
+        System.out.println("Se han cargado "+numHilitos+" programas.");
         System.out.println("El arreglo de instrucciones hasta el momento es el siguiente:");
         for(int i=0; i < instrucciones.size(); i++){
             System.out.print(instrucciones.get(i)+ " ");
         }
         System.out.println();
-        System.out.println("Los indices donde inicia cada instrucción (PCs) son los siguientes:");
+        System.out.println("Los indices donde inicia cada programa(PCs) son los siguientes:");
         for(int i=0; i < pcs.size(); i++){
             System.out.print(pcs.get(i)+ " ");
         }
@@ -59,5 +60,5 @@ public class Multiprocesador {
         CargadorArchivos crg = new CargadorArchivos(mp, sim);
         crg.setVisible(true);
     }
-    
+ 
 }

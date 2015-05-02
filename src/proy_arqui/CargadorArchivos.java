@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -123,30 +124,35 @@ public class CargadorArchivos extends javax.swing.JFrame {
         // TODO add your handling code here:
         String aux = "";   
         String texto = "";
-        try{
          /**llamamos el metodo que permite cargar la ventana*/
          JFileChooser file = new JFileChooser();
-         file.showOpenDialog(this);
-         /**abrimos el archivo seleccionado*/
-         File abre = file.getSelectedFile();
-         jTextField1.setText( abre.getAbsolutePath() );
-         /**recorremos el archivo, lo leemos para plasmarlo
-         *en el area de texto*/
-            if(abre!=null){    
-               FileReader archivos = new FileReader(abre);
-               BufferedReader lee = new BufferedReader(archivos);
-               while((aux = lee.readLine()) != null){
-                  texto += aux + " ";
-               }
-               lee.close();
-               this.texto = texto;
-            }    
-         }
-         catch(IOException ex){
-          JOptionPane.showMessageDialog(null,ex+"" +
-                "\nNo se ha encontrado el archivo",
-                      "ADVERTENCIA!!!",JOptionPane.WARNING_MESSAGE);
-         }
+         FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+         file.setFileFilter(filter);
+         int result = file.showSaveDialog(this);
+         //file.showOpenDialog(this);
+         if (result == JFileChooser.APPROVE_OPTION) {
+            /**abrimos el archivo seleccionado*/
+            File abre = file.getSelectedFile();
+            jTextField1.setText( abre.getAbsolutePath() );
+            /**recorremos el archivo, lo leemos para plasmarlo
+            *en el area de texto*/
+            try{
+               if(abre!=null){    
+                  FileReader archivos = new FileReader(abre);
+                  BufferedReader lee = new BufferedReader(archivos);
+                  while((aux = lee.readLine()) != null){
+                     texto += aux + " ";
+                  }
+                  lee.close();
+                  this.texto = texto;
+               }    
+            }
+            catch(IOException ex){
+             JOptionPane.showMessageDialog(null,ex+"" +
+                   "\nNo se ha encontrado el archivo",
+                         "ADVERTENCIA!!!",JOptionPane.WARNING_MESSAGE);
+            }
+        } //else if (result == JFileChooser.CANCEL_OPTION)
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /*
