@@ -27,9 +27,8 @@ public class Procesador extends Thread {
     
     public void cargarACache(int direccionMemoria, int direccionCache){
         int j = direccionMemoria;
-        int i;
         // Copia el bloque entero en el lugar que le corresponde en cache
-        for(i = 0; i < 4; i++){
+        for(int i = 0; i < 4; i++){
             cacheDatos[direccionCache][i] = memoria[j];
             j++;
         }
