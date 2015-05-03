@@ -172,5 +172,73 @@ public class Procesador extends Thread {
     public void DSUB(int Y, int Z, int X){
         regs[X]=regs[Y]-regs[Z];
     }
+    
+    public void procesarInstruccion(int cod, int param1, int param2, int param3){
+        switch(cod){
+            case 8:
+                DADDI(param1, param2, param3);
+            break;
+            case 32:
+                DADD(param1, param2, param3);
+            break;
+            case 34:
+                DSUB(param1, param2, param3);
+            break;
+            case 35:
+                LW(param1, param2, param3);
+            break;
+            case 43:
+                SW(param1, param2, param3);
+            break;
+            case 4:
+                BEQZ(param1, param3);
+            break;
+            case 5:
+                BNEZ(param1, param3);
+            break;
+            case 63:
+            break;
+        }
+    }
+    
+    public void procesar(int pcA, int limit){
+        IR = pcA;
+        PC = pcA+4;
+        int cod, p1, p2, p3;
+        for(int i = IR; i < limit; i+=4){
+            cod = myMp.getInstIdx(i);
+            p1 = myMp.getInstIdx(i+1);
+            p2 = myMp.getInstIdx(i+2); 
+            p3 = myMp.getInstIdx(i+3);
+            procesarInstruccion(cod, p1, p2, p3);
+            verEstado();
+        }
+    }
+    
     public void FIN(){}   
+    
+    public void verEstado(){
+        String estado = "";
+        estado += "El PC es: "+ PC + "\n";
+        estado += "El IR es: "+ IR + "\n";
+        estado += "Los registros de procesador son:\n";
+        for(int i = 0; i < 32; i++){
+            estado += regs[i]+", ";
+        }
+        estado += "\n";
+        estado += "La memoria cache contiene:\n";
+        for(int i = 0; i < 4; i++){
+            estado+="Bloque "+i+", estado: "+estCache[i][EST]+", idBloque: "+estCache[i][ID]+" --> ";
+            for(int j= 0; j < 4; j++){
+                 estado += dcache[i][j]+ ", ";
+            }
+            estado += "\n";
+        }
+        estado += "La memoria de datos contiene:\n";
+        for(int i = 0; i < 32; i++){
+            estado += dmem[i]+", ";
+        }
+        estado += "\n";
+        System.out.println(estado);
+    }
 }

@@ -19,14 +19,18 @@ import proy_arqui.CargadorArchivos;
  */
 public class Multiprocesador {
 
-    private ArrayList instrucciones = new ArrayList();
-    private ArrayList pcs = new ArrayList();
+    private Simulacion sim;
+    private Procesador proc1 = new Procesador(this);
+    private ArrayList<Integer> instrucciones = new ArrayList<Integer>();
+    private ArrayList<Integer> pcs = new ArrayList<Integer>();
     private int numHilitos;
     
+    public Multiprocesador(Simulacion sim){
+        this.sim = sim;
+    }
     public void agregarInstruccion(int num){
         instrucciones.add(num);
     }
-    
     public void verInstrucciones(){
         System.out.println("Se han cargado "+numHilitos+" programas.");
         System.out.println("El arreglo de instrucciones hasta el momento es el siguiente:");
@@ -39,14 +43,31 @@ public class Multiprocesador {
             System.out.print(pcs.get(i)+ " ");
         }
         System.out.println();
+        System.out.println();
     }
     
     public void sumarHilito(){
         numHilitos++;
     }
-    
     public void agregarPc(){
         pcs.add(instrucciones.size());
+    }
+    public int getInstIdx(int idx){
+        return instrucciones.get(idx);
+    }
+    
+    public void correrProgramas(){
+        int pcActual;
+        int limite = -1;
+        if(numHilitos!=0){
+            for(int i = 0; i < numHilitos; i++){
+                pcActual = pcs.get(i);
+                if((i+1)<pcs.size()) limite = pcs.get(i+1); else limite = instrucciones.size()-pcActual;
+                sim.setProc1("1");
+                proc1.procesar(pcActual, limite);
+                //proc1.verEstado();
+            }
+        }
     }
     
     /**
@@ -54,9 +75,8 @@ public class Multiprocesador {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Multiprocesador mp = new Multiprocesador();
         Simulacion sim = new Simulacion();
-        Procesador proc = new Procesador(mp);
+        Multiprocesador mp = new Multiprocesador(sim);
         CargadorArchivos crg = new CargadorArchivos(mp, sim);
         crg.setVisible(true);
     }

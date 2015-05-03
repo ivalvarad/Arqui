@@ -62,7 +62,7 @@ public class CargadorArchivos extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("Continuar");
+        jButton2.setText("Iniciar simulación");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -160,7 +160,8 @@ public class CargadorArchivos extends javax.swing.JFrame {
     */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.setVisible(false);
-        mySim.back = this;
+        //mySim.back = this;
+        myMp.correrProgramas();
         mySim.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
