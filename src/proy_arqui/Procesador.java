@@ -55,7 +55,7 @@ public class Procesador extends Thread {
         int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
         
         // Si el bloque que requerimos no esta en cache:
-        if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){          // El ID que se guarda en caché es el mismo de memoria. -Érick
+        if(idBloqEnCache != numBloqMem /*dirNumBloqMem*/){          // El ID que se guarda en caché es el mismo de memoria. -Érick
             switch(estadoBloqEnCache){
                 case C:         // Si está compartido nos traemos el bloque de memoria a cache
                     cargarACache(dirNumBloqMem, dirBloqCache);
@@ -89,8 +89,8 @@ public class Procesador extends Thread {
         registros[X] = cacheDatos[dirBloqCache][numPalabra];
     }
     
-    //RX, n(RY)
-    //M(n + (Ry))  Rx
+    // Guardar una palabra: RX, n(RY)
+    // M(n + (Ry))  Rx
     public void SW(int Y, int X, int n){
         int numByte = registros[Y]+n;                               // Numero del byte que quiero leer de memoria 
         int numBloqMem = Math.floorDiv(numByte,16);                 // Indice del bloque en memoria (0-24)
@@ -101,7 +101,7 @@ public class Procesador extends Thread {
         int dirNumBloqMem = numBloqMem*4;
         
         // Si el bloque que requerimos no esta en cache
-        if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){
+        if(idBloqEnCache != numBloqMem /*dirNumBloqMem*/){
             switch(estadoBloqEnCache){
                 case C:         // Si está compartido nos traemos el bloque de memoria a cache
                     cargarACache(dirNumBloqMem, dirBloqCache);
