@@ -19,7 +19,7 @@ public class Procesador extends Thread {
     // Para la cache de datos agregamos dos filas extra que hacen referencia al número de bloque y al estado del bloque ('C','M','I')
     private int cacheDatos[][] = new int[4][4];     // Cache de datos (4 bloques, cada bloque con 4 palabras, cada palabra 4 bytes)
     private int estadoCache[][] = new int[4][2];    // 8bloques*4 = 32 palabras ---> 32palabras*4 = 128 direcciones de palabras
-    private int memoria[] = new int[32];            // Memoria de datos compartida (8 bloques, cada uno con 4 palabras, cada palabra 4 bytes)
+    private int memoria[] = new int[32];            // Memoria de datos compartida (8 bloques, cada uno con 4 palabras)
     
     public Procesador(Multiprocesador mp){
         myMp = mp;
@@ -36,31 +36,30 @@ public class Procesador extends Thread {
         int estadoBloqEnCache = estadoCache[dirBloqCache][ESTADO];  //estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
         
         // Si el bloque que requerimos no esta en cache:
-        int convNumBloqMem = numBloqMem*4; // ¿Se ocupa esa conversión? El ID que se guarda es en caché es el mismo de memoria. -Érick
-        if(idBloqEnCache != /*numBloqMem*/ convNumBloqMem){
+        int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
+        if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){          // El ID que se guarda en caché es el mismo de memoria. -Érick
             switch(estadoBloqEnCache){
-                case C:
-                    //nos traemos el bloque de memoria a cache
-                    int j = convNumBloqMem;
+                case C:         // Nos traemos el bloque de memoria a cache
+                    int j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         cacheDatos[dirBloqCache][i] = memoria[j];
                         j++;
                     }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
                 break;
                 case M:
-                    j = convNumBloqMem;
+                    j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         memoria[j] = cacheDatos[dirBloqCache][i];
                         j++;
                     }
-                    j = convNumBloqMem;
+                    j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         cacheDatos[dirBloqCache][i] = memoria[j];
                         j++;
                     }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
                 break;
                 case I:
@@ -73,12 +72,12 @@ public class Procesador extends Thread {
                     registros[X] = cacheDatos[dirBloqCache][numPalabra];
                 break;
                 case M:
-                    int j = convNumBloqMem;
+                    int j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         memoria[j] = cacheDatos[dirBloqCache][i];
                         j++;
                     }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
                     
                     registros[X] = cacheDatos[dirBloqCache][numPalabra];
