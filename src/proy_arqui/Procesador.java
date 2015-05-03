@@ -37,7 +37,7 @@ public class Procesador extends Thread {
         
         // Si el bloque que requerimos no esta en cache:
         int convNumBloqMem = numBloqMem*4; // ¿Se ocupa esa conversión? El ID que se guarda es en caché es el mismo de memoria. -Érick
-        if(idBloqEnCache != convNumBloqMem){
+        if(idBloqEnCache != /*numBloqMem*/ convNumBloqMem){
             switch(estadoBloqEnCache){
                 case C:
                     //nos traemos el bloque de memoria a cache
