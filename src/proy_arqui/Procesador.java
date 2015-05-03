@@ -34,8 +34,16 @@ public class Procesador extends Thread {
             j++;
         }
     }
+    
+    public void guardarEnMemoria(int direccionMemoria, int direccionCache){
+        int j = direccionMemoria;
+        for(int i = 0; i < 4; i++){
+            memoria[j] = cacheDatos[direccionCache][i];
+            j++;
+        }
+    }
 
-// Cargar una palabra: RX, n(RY)
+    // Cargar una palabra: RX, n(RY)
     // Rx <- M(n + (Ry))
     public void LW(int Y, int X, int n){
         int numByte = registros[Y]+n;                               // Numero del byte que quiero leer de memoria 
@@ -49,50 +57,36 @@ public class Procesador extends Thread {
         int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
         if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){          // El ID que se guarda en caché es el mismo de memoria. -Érick
             switch(estadoBloqEnCache){
-                case C:     // Si está compartido nos traemos el bloque de memoria a cache
+                case C:         // Si está compartido nos traemos el bloque de memoria a cache
                     cargarACache(dirNumBloqMem, dirBloqCache);
                     estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
                     estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
-                case M:
-                    int j = dirNumBloqMem;
+                case M:     // Si está modificado se guarda en memoria el bloque que está en caché y luego se carga el nuevo
+                    guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Creo que esos son los parámetros correctos. -Érick
+                    /*int j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         memoria[j] = cacheDatos[dirBloqCache][i];
                         j++;
-                    }
-                    j = dirNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        cacheDatos[dirBloqCache][i] = memoria[j];
-                        j++;
-                    }
+                    }*/
+                    cargarACache(dirNumBloqMem, dirBloqCache);
                     estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
                 break;
-                case I:
-                    //previsto para los directorios, por el momento no puede estar invalido
-                break;
+                case I: break;  // Previsto para los directorios, por el momento no puede estar invalido
             }
-        }else{ //HIT :D
+        }else{ // HIT :D
             switch(estadoBloqEnCache){
-                case C:
-                    registros[X] = cacheDatos[dirBloqCache][numPalabra];
-                break;
+                case C: break;  // Si está compartido solo queda cargar la palabra al registro
                 case M:
-                    int j = dirNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        memoria[j] = cacheDatos[dirBloqCache][i];
-                        j++;
-                    }
-                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                    guardarEnMemoria(dirNumBloqMem, dirBloqCache);
                     estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
-                    
-                    registros[X] = cacheDatos[dirBloqCache][numPalabra];
                 break;
-                case I:
-                    //previsto para los directorios, por el momento no puede estar invalido
-                break;
+                case I: break;  // Previsto para los directorios, por el momento no puede estar invalido
             }
         }
+        // Una vez realizadas las estrategias para hits y misses solo queda cargar la palabra al registro
+        registros[X] = cacheDatos[dirBloqCache][numPalabra];
     }
     
     //RX, n(RY)
