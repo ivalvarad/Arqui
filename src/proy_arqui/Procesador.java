@@ -51,10 +51,10 @@ public class Procesador extends Thread {
         int numPalabra = (numByte%16)/4;
         int dirBloqCache = numBloqMem%4;                            // Indice donde debe estar el bloque en cache
         int idBloqEnCache = estadoCache[dirBloqCache][ID];          // ID del bloque que ocupa actualmente esa direccion en cache
-        int estadoBloqEnCache = estadoCache[dirBloqCache][ESTADO];  //estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
+        int estadoBloqEnCache = estadoCache[dirBloqCache][ESTADO];  // Estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
+        int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
         
         // Si el bloque que requerimos no esta en cache:
-        int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
         if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){          // El ID que se guarda en caché es el mismo de memoria. -Érick
             switch(estadoBloqEnCache){
                 case C:         // Si está compartido nos traemos el bloque de memoria a cache
@@ -62,7 +62,7 @@ public class Procesador extends Thread {
                     estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
                     estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
-                case M:     // Si está modificado se guarda en memoria el bloque que está en caché y luego se carga el nuevo
+                case M:         // Si está modificado se guarda en memoria el bloque que está en caché y luego se carga el nuevo
                     guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Creo que esos son los parámetros correctos. -Érick
                     /*int j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
@@ -70,8 +70,8 @@ public class Procesador extends Thread {
                         j++;
                     }*/
                     cargarACache(dirNumBloqMem, dirBloqCache);
-                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
+                    estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case I: break;  // Previsto para los directorios, por el momento no puede estar invalido
             }
@@ -80,7 +80,7 @@ public class Procesador extends Thread {
                 case C: break;  // Si está compartido solo queda cargar la palabra al registro
                 case M:
                     guardarEnMemoria(dirNumBloqMem, dirBloqCache);
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
+                    estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case I: break;  // Previsto para los directorios, por el momento no puede estar invalido
             }
@@ -92,69 +92,48 @@ public class Procesador extends Thread {
     //RX, n(RY)
     //M(n + (Ry))  Rx
     public void SW(int Y, int X, int n){
-        int numByte = registros[Y]+n; //#byte 
-        int numBloqMem = Math.floorDiv(numByte,16); //indiceBloqueMemDatos (0-24)
-        int numpalabra = (numByte%16)/4;
-        int dirBloqCache = numBloqMem%4; //indiceBloqueCache
-        int idBloqEnCache = estadoCache[dirBloqCache][ID]; //bloque que ocupa actualmente esa dir de cache
-        int estadoBloqEnCache = estadoCache[dirBloqCache][ESTADO]; //estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
-        //si el bloque que requerimos no esta en cache
-        int convNumBloqMem = numBloqMem*4; //VEREMOS!
-        if(idBloqEnCache != convNumBloqMem){
+        int numByte = registros[Y]+n;                               // Numero del byte que quiero leer de memoria 
+        int numBloqMem = Math.floorDiv(numByte,16);                 // Indice del bloque en memoria (0-24)
+        int numPalabra = (numByte%16)/4;
+        int dirBloqCache = numBloqMem%4;                            // Indice donde debe estar el bloque en cache
+        int idBloqEnCache = estadoCache[dirBloqCache][ID];          // ID del bloque que ocupa actualmente esa direccion en cache
+        int estadoBloqEnCache = estadoCache[dirBloqCache][ESTADO];  // Estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
+        int dirNumBloqMem = numBloqMem*4;
+        
+        // Si el bloque que requerimos no esta en cache
+        if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){
             switch(estadoBloqEnCache){
-                case C:
-                    //nos traemos el bloque de memoria a cache
-                    int j = convNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        cacheDatos[dirBloqCache][i] = memoria[j];
-                        j++;
-                    }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
+                case C:         // Si está compartido nos traemos el bloque de memoria a cache
+                    cargarACache(dirNumBloqMem, dirBloqCache);
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
+                    estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
-                case M:
-                    j = convNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        memoria[j] = cacheDatos[dirBloqCache][i];
-                        j++;
-                    }
-                    j = convNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        cacheDatos[dirBloqCache][i] = memoria[j];
-                        j++;
-                    }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
+                case M:         // Si está modificado se guarda en memoria el bloque que está en caché y luego se carga el nuevo
+                    guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Creo que esos son los parámetros correctos. -Érick
+                    cargarACache(dirNumBloqMem, dirBloqCache);
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
+                    estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
-                case I:
-                    //previsto para los directorios, por el momento no puede estar invalido
-                break;
+                case I: break;  // Previsto para los directorios, por el momento no puede estar invalido
             }
-        }else{ //HIT :D
+        }else{ // HIT :D
             switch(estadoBloqEnCache){
-                case C:
-                    cacheDatos[dirBloqCache][numpalabra] = registros[X];
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = M; //bloque que ocupa actualmente esa dir de cache
+                case C:         // Si está compartido guardamos el nuevo valor en la palabra y cambiamos el estado a 'modificado'
+                    cacheDatos[dirBloqCache][numPalabra] = registros[X];
+                    estadoCache[dirBloqCache][ESTADO] = M;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
-                case M:
-                    int j = convNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        memoria[j] = cacheDatos[dirBloqCache][i];
-                        j++;
-                    }
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
-                    
-                    cacheDatos[dirBloqCache][numpalabra] = registros[X];
-                    estadoCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = M; //bloque que ocupa actualmente esa dir de cache
+                case M:         // Si está modificado guardamos el valor actual en memoria y luego guardamos el nuevo valor en la palabra
+                    guardarEnMemoria(dirNumBloqMem, dirBloqCache);
+                    //estadoCache[dirBloqCache][ESTADO] = C;        // Estado del bloque que ocupa ahora esa direccion de cache
+                    estadoCache[dirBloqCache][ESTADO] = M;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case I:
                     //previsto para los directorios, por el momento no puede estar invalido
                 break;
             }
         }
+        // Una vez realizadas las estrategias para hits y misses solo queda guardar el nuevo valor a la palabra
+        cacheDatos[dirBloqCache][numPalabra] = registros[X];
     }
     public void BEQZ(int X, int n){
         if(registros[X]==0) PC+=4*(n-1);
