@@ -15,7 +15,7 @@ public class Procesador extends Thread {
     
     private int PC; //contador de programa
     private int IR; //registro de instruccion
-    private int regs[] = new int[32]; //32 registros
+    private int registros[] = new int[32]; //32 registros
     //para la cache de datos agregamos dos filas extra que hacen referencia al #deBloque y al #estadoBloque ('C','M','I')
     private int dcache[][] = new int[4][4]; //cache de datos (4 bloques, cada bloque con 4 palabras, cada palabra 4 bytes)
     private int estCache[][] = new int[4][2]; 
@@ -29,7 +29,7 @@ public class Procesador extends Thread {
     //RX, n(RY)
     //Rx <- M(n + (Ry))
     public void LW(int Y, int X, int n){
-        int numByte = regs[Y]+n; //#byte 
+        int numByte = registros[Y]+n; //#byte 
         int numBloqMem = Math.floorDiv(numByte,16); //indiceBloqueMemDatos (0-24)
         int numpalabra = (numByte%16)/4;
         int dirBloqCache = numBloqMem%4; //indiceBloqueCache
@@ -70,7 +70,7 @@ public class Procesador extends Thread {
         }else{ //HIT :D
             switch(estadoBloqEnCache){
                 case C:
-                    regs[X] = dcache[dirBloqCache][numpalabra];
+                    registros[X] = dcache[dirBloqCache][numpalabra];
                 break;
                 case M:
                     int j = convNumBloqMem;
@@ -81,7 +81,7 @@ public class Procesador extends Thread {
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                     
-                    regs[X] = dcache[dirBloqCache][numpalabra];
+                    registros[X] = dcache[dirBloqCache][numpalabra];
                 break;
                 case I:
                     //previsto para los directorios, por el momento no puede estar invalido
@@ -93,7 +93,7 @@ public class Procesador extends Thread {
     //RX, n(RY)
     //M(n + (Ry))  Rx
     public void SW(int Y, int X, int n){
-        int numByte = regs[Y]+n; //#byte 
+        int numByte = registros[Y]+n; //#byte 
         int numBloqMem = Math.floorDiv(numByte,16); //indiceBloqueMemDatos (0-24)
         int numpalabra = (numByte%16)/4;
         int dirBloqCache = numBloqMem%4; //indiceBloqueCache
@@ -134,7 +134,7 @@ public class Procesador extends Thread {
         }else{ //HIT :D
             switch(estadoBloqEnCache){
                 case C:
-                    dcache[dirBloqCache][numpalabra] = regs[X];
+                    dcache[dirBloqCache][numpalabra] = registros[X];
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
                 break;
@@ -147,7 +147,7 @@ public class Procesador extends Thread {
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                     
-                    dcache[dirBloqCache][numpalabra] = regs[X];
+                    dcache[dirBloqCache][numpalabra] = registros[X];
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
                 break;
@@ -158,19 +158,19 @@ public class Procesador extends Thread {
         }
     }
     public void BEQZ(int X, int n){
-        if(regs[X]==0) PC+=4*(n-1);
+        if(registros[X]==0) PC+=4*(n-1);
     }
     public void BNEZ(int X, int n){
-        if(regs[X]!=0) PC+=4*(n-1);
+        if(registros[X]!=0) PC+=4*(n-1);
     }
     public void DADDI(int Y, int X, int n){
-        regs[X]=regs[Y]+n;
+        registros[X]=registros[Y]+n;
     }
     public void DADD(int Y, int Z, int X){
-        regs[X]=regs[Y]+regs[Z];
+        registros[X]=registros[Y]+registros[Z];
     }
     public void DSUB(int Y, int Z, int X){
-        regs[X]=regs[Y]-regs[Z];
+        registros[X]=registros[Y]-registros[Z];
     }
     public void FIN(){}   
 }
