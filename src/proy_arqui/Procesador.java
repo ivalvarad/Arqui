@@ -24,6 +24,10 @@ public class Procesador extends Thread {
     
     public Procesador(Multiprocesador mp){
         myMp = mp;
+        PC = 0;
+        for(int x=0; x < 4; ++x){
+            estCache[x][EST] = I;
+        }
     }
     
     //RX, n(RY)
@@ -64,38 +68,47 @@ public class Procesador extends Thread {
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                 break;
                 case I:
-                    //previsto para los directorios, por el momento no puede estar invalido
-                break;
-            }
-        }else{ //HIT :D
-            switch(estadoBloqEnCache){
-                case C:
-                    regs[X] = dcache[dirBloqCache][numpalabra];
-                break;
-                case M:
-                    int j = convNumBloqMem;
+                    j = convNumBloqMem;
                     for(int i = 0; i < 4; i++){
-                        dmem[j] = dcache[dirBloqCache][i];
+                        dcache[dirBloqCache][i] = dmem[j];
                         j++;
                     }
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
-                    
-                    regs[X] = dcache[dirBloqCache][numpalabra];
-                break;
-                case I:
                     //previsto para los directorios, por el momento no puede estar invalido
                 break;
             }
+        } //HIT :D
+        switch(estadoBloqEnCache){
+            case C:
+                regs[X] = dcache[dirBloqCache][numpalabra];
+            break;
+            case M:
+                int j = convNumBloqMem;
+                for(int i = 0; i < 4; i++){
+                    dmem[j] = dcache[dirBloqCache][i];
+                    j++;
+                }
+                estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+
+                regs[X] = dcache[dirBloqCache][numpalabra];
+            break;
+            case I:
+                //previsto para los directorios, por el momento no puede estar invalido
+            break;
         }
     }
     
     //RX, n(RY)
     //M(n + (Ry))  Rx
     public void SW(int Y, int X, int n){
+        System.out.println("valor del registro Y "+ regs[Y] + "y este es el valor de n" +n);
         int numByte = regs[Y]+n; //#byte 
-        int numBloqMem = Math.floorDiv(numByte,16); //indiceBloqueMemDatos (0-24)
+        System.out.println("viendo desplazamiento "+ numByte + "y este es el valor de n" +n);
+        int numBloqMem = numByte/16; //indiceBloqueMemDatos (0-24)
         int numpalabra = (numByte%16)/4;
+        System.out.println("calculando posiciones en cache "+ numBloqMem + "y este es el valor de n" +n);
         int dirBloqCache = numBloqMem%4; //indiceBloqueCache
         int idBloqEnCache = estCache[dirBloqCache][ID]; //bloque que ocupa actualmente esa dir de cache
         int estadoBloqEnCache = estCache[dirBloqCache][EST]; //estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
@@ -128,33 +141,39 @@ public class Procesador extends Thread {
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                 break;
                 case I:
-                    //previsto para los directorios, por el momento no puede estar invalido
-                break;
-            }
-        }else{ //HIT :D
-            switch(estadoBloqEnCache){
-                case C:
-                    dcache[dirBloqCache][numpalabra] = regs[X];
-                    estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
-                break;
-                case M:
-                    int j = convNumBloqMem;
+                    j = convNumBloqMem;
                     for(int i = 0; i < 4; i++){
-                        dmem[j] = dcache[dirBloqCache][i];
+                        dcache[dirBloqCache][i] = dmem[j];
                         j++;
                     }
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
-                    
-                    dcache[dirBloqCache][numpalabra] = regs[X];
-                    estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
-                break;
-                case I:
                     //previsto para los directorios, por el momento no puede estar invalido
                 break;
             }
+        } //HIT :D
+        switch(estadoBloqEnCache){
+            case C:
+                dcache[dirBloqCache][numpalabra] = regs[X];
+                estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
+            break;
+            case M:
+                int j = convNumBloqMem;
+                for(int i = 0; i < 4; i++){
+                    dmem[j] = dcache[dirBloqCache][i];
+                    j++;
+                }
+                estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                    
+                dcache[dirBloqCache][numpalabra] = regs[X];
+                estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
+                estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
+            break;
+            case I:
+                    //previsto para los directorios, por el momento no puede estar invalido
+            break;
         }
     }
     public void BEQZ(int X, int n){
@@ -165,6 +184,7 @@ public class Procesador extends Thread {
     }
     public void DADDI(int Y, int X, int n){
         regs[X]=regs[Y]+n;
+        System.out.println("Estoy intentando meter en el registro "+X+" lo que está en el registro "+Y+" "+n);
     }
     public void DADD(int Y, int Z, int X){
         regs[X]=regs[Y]+regs[Z];
@@ -174,6 +194,7 @@ public class Procesador extends Thread {
     }
     
     public void procesarInstruccion(int cod, int param1, int param2, int param3){
+        PC = PC + 4;
         switch(cod){
             case 8:
                 DADDI(param1, param2, param3);
@@ -202,8 +223,7 @@ public class Procesador extends Thread {
     }
     
     public void procesar(int pcA, int limit){
-        IR = pcA;
-        PC = pcA+4;
+        IR = PC;
         int cod, p1, p2, p3;
         for(int i = IR; i < limit; i+=4){
             cod = myMp.getInstIdx(i);
