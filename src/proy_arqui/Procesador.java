@@ -25,7 +25,17 @@ public class Procesador extends Thread {
         myMp = mp;
     }
     
-    // Cargar una palabra: RX, n(RY)
+    public void cargarACache(int direccionMemoria, int direccionCache){
+        int j = direccionMemoria;
+        int i;
+        // Copia el bloque entero en el lugar que le corresponde en cache
+        for(i = 0; i < 4; i++){
+            cacheDatos[direccionCache][i] = memoria[j];
+            j++;
+        }
+    }
+
+// Cargar una palabra: RX, n(RY)
     // Rx <- M(n + (Ry))
     public void LW(int Y, int X, int n){
         int numByte = registros[Y]+n;                               // Numero del byte que quiero leer de memoria 
@@ -39,17 +49,13 @@ public class Procesador extends Thread {
         int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
         if(idBloqEnCache != /*numBloqMem*/ dirNumBloqMem){          // El ID que se guarda en caché es el mismo de memoria. -Érick
             switch(estadoBloqEnCache){
-                case C:         // Nos traemos el bloque de memoria a cache
-                    int j = dirNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        cacheDatos[dirBloqCache][i] = memoria[j];
-                        j++;
-                    }
-                    estadoCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estadoCache[dirBloqCache][ESTADO] = C; //bloque que ocupa actualmente esa dir de cache
+                case C:     // Si está compartido nos traemos el bloque de memoria a cache
+                    cargarACache(dirNumBloqMem, dirBloqCache);
+                    estadoCache[dirBloqCache][ID] = dirNumBloqMem;  // Bloque que ocupa ahora esa direccion de cache
+                    estadoCache[dirBloqCache][ESTADO] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case M:
-                    j = dirNumBloqMem;
+                    int j = dirNumBloqMem;
                     for(int i = 0; i < 4; i++){
                         memoria[j] = cacheDatos[dirBloqCache][i];
                         j++;
