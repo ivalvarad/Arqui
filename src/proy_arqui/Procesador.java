@@ -49,13 +49,13 @@ public class Procesador extends Thread {
     //RX, n(RY)
     //Rx <- M(n + (Ry))
     public void LW(int Y, int X, int n){
-        int numByte = regs[Y]+n;                               // Numero del byte que quiero leer de memoria 
-        int numBloqMem = Math.floorDiv(numByte,16);                 // Indice del bloque en memoria (0-24)
+        int numByte = regs[Y]+n;                                // Numero del byte que quiero leer de memoria 
+        int numBloqMem = Math.floorDiv(numByte,16);             // Indice del bloque en memoria (0-24)
         int numPalabra = (numByte%16)/4;
-        int dirBloqCache = numBloqMem%4;                            // Indice donde debe estar el bloque en cache
-        int idBloqEnCache = estCache[dirBloqCache][ID];          // ID del bloque que ocupa actualmente esa direccion en cache
-        int estadoBloqEnCache = estCache[dirBloqCache][EST];  // Estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
-        int dirNumBloqMem = numBloqMem*4;                           // Conversion para mapear la direccion inicial del bloque en memoria
+        int dirBloqCache = numBloqMem%4;                        // Indice donde debe estar el bloque en cache
+        int idBloqEnCache = estCache[dirBloqCache][ID];         // ID del bloque que ocupa actualmente esa direccion en cache
+        int estadoBloqEnCache = estCache[dirBloqCache][EST];    // Estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
+        int dirNumBloqMem = numBloqMem*4;                       // Conversion para mapear la direccion inicial del bloque en memoria
 
         //CASO 1: el bloque que requerimos no esta en cache, en su lugar hay otro bloque
         if(idBloqEnCache != dirNumBloqMem){
