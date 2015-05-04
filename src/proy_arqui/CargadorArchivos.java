@@ -161,8 +161,8 @@ public class CargadorArchivos extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.setVisible(false);
         //mySim.back = this;
-        myMp.correrProgramas();
         mySim.setVisible(true);
+        myMp.correrProgramas();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /*
