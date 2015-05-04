@@ -61,36 +61,20 @@ public class Procesador extends Thread {
         if(idBloqEnCache != dirNumBloqMem){
             //el id del bloque que esta ocupando cache es -1 (no hay bloque) o es otro bloque
             if(idBloqEnCache == -1){
-                    int j = dirNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        dcache[dirBloqCache][i] = dmem[j];
-                        j++;
-                    }
+                    cargarACache(dirNumBloqMem, dirBloqCache);
                     estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
             }else{
                 switch(estadoBloqEnCache){
                     case C:
                         //nos traemos el bloque de memoria a cache
-                        int j = dirNumBloqMem;
-                        for(int i = 0; i < 4; i++){
-                            dcache[dirBloqCache][i] = dmem[j];
-                            j++;
-                        }
+                        cargarACache(dirNumBloqMem, dirBloqCache);
                         estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                         estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                     break;
                     case M:
-                        j = dirNumBloqMem;
-                        for(int i = 0; i < 4; i++){
-                            dmem[j] = dcache[dirBloqCache][i];
-                            j++;
-                        }
-                        j = dirNumBloqMem;
-                        for(int i = 0; i < 4; i++){
-                            dcache[dirBloqCache][i] = dmem[j];
-                            j++;
-                        }
+                        guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Creo que esos son los parámetros correctos. -Érick
+                        cargarACache(dirNumBloqMem, dirBloqCache);
                         estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                         estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                     break;
@@ -102,16 +86,11 @@ public class Procesador extends Thread {
         }else{ //HIT :D 
             switch(estadoBloqEnCache){
                 case C:
-                    //regs[X] = dcache[dirBloqCache][numpalabra];
+                    // Si está compartido solo queda cargar la palabra al registro
                 break;
                 case M:
-                    int j = dirNumBloqMem;
-                    for(int i = 0; i < 4; i++){
-                        dmem[j] = dcache[dirBloqCache][i];
-                        j++;
-                    }
-                    estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                                        guardarEnMemoria(dirNumBloqMem, dirBloqCache);
+                    estCache[dirBloqCache][EST] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
 
                     //regs[X] = dcache[dirBloqCache][numpalabra];
                 break;
