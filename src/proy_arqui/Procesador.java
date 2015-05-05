@@ -7,19 +7,18 @@ public class Procesador extends Thread {
     //COLUMNAS EN CACHE
     private final int ID = 0;
     private final int EST = 1;
-    
     //ESTADOS DE BLOQUES
     private final int C = 0;
     private final int M = 1;
     private final int I = 2;
     
-    private int PC; // Contador de programa
-    private int IR; // Registro de instruccion
-    private int regs[] = new int[32];          // 32 registros
+    private int PC;                             // Contador de programa
+    private int IR;                             // Registro de instruccion
+    private int regs[] = new int[32];           // 32 registros
     // Para la cache de datos agregamos dos filas extra que hacen referencia al número de bloque y al estado del bloque ('C','M','I')
     private int dcache[][] = new int[4][4];     // Cache de datos (4 bloques, cada bloque con 4 palabras, cada palabra 4 bytes)
-    private int estCache[][] = new int[4][2];    // 8bloques*4 = 32 palabras ---> 32palabras*4 = 128 direcciones de palabras
-    private int dmem[] = new int[32];            // Memoria de datos compartida (8 bloques, cada uno con 4 palabras)    
+    private int estCache[][] = new int[4][2];   // 8bloques*4 = 32 palabras ---> 32palabras*4 = 128 direcciones de palabras
+    private int dmem[] = new int[32];           // Memoria de datos compartida (8 bloques, cada uno con 4 palabras)    
     
     public Procesador(Multiprocesador mp){
         myMp = mp;
@@ -29,15 +28,16 @@ public class Procesador extends Thread {
         }
     }
     
+    // Copia el bloque entero en el lugar que le corresponde en cache
     public void cargarACache(int direccionMemoria, int direccionCache){
         int j = direccionMemoria;
-        // Copia el bloque entero en el lugar que le corresponde en cache
         for(int i = 0; i < 4; i++){
             dcache[direccionCache][i] = dmem[j];
             j++;
         }
     }
     
+    // Guarda el bloque entero desde cache hasta el lugar en memoria que le corresponde
     public void guardarEnMemoria(int direccionMemoria, int direccionCache){
         int j = direccionMemoria;
         for(int i = 0; i < 4; i++){
@@ -46,8 +46,7 @@ public class Procesador extends Thread {
         }
     }
     
-    //RX, n(RY)
-    //Rx <- M(n + (Ry))
+    // Leer una palabra
     public void LW(int Y, int X, int n){
         int numByte = regs[Y]+n;                                // Numero del byte que quiero leer de memoria 
         int numBloqMem = Math.floorDiv(numByte,16);             // Indice del bloque en memoria (0-24)
@@ -57,26 +56,26 @@ public class Procesador extends Thread {
         int estadoBloqEnCache = estCache[dirBloqCache][EST];    // Estado del bloque que ocupa esa dir de cache ('M', 'C', 'I')
         int dirNumBloqMem = numBloqMem*4;                       // Conversion para mapear la direccion inicial del bloque en memoria
 
-        //CASO 1: el bloque que requerimos no esta en cache, en su lugar hay otro bloque
+        // CASO 1: el bloque que requerimos no esta en cache, en su lugar hay otro bloque
         if(idBloqEnCache != dirNumBloqMem){
-            //el id del bloque que esta ocupando cache es -1 (no hay bloque) o es otro bloque
+            // El id del bloque que esta ocupando cache es -1 (no hay bloque) o es otro bloque
             if(idBloqEnCache == -1){
                     cargarACache(dirNumBloqMem, dirBloqCache);
-                    estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                    estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                    estCache[dirBloqCache][ID] = dirNumBloqMem; // Bloque que ocupa ahora esa direccion de cache
+                    estCache[dirBloqCache][EST] = C;            // Estado del bloque que ocupa ahora esa direccion de cache
             }else{
                 switch(estadoBloqEnCache){
                     case C:
-                        //nos traemos el bloque de memoria a cache
+                        // Nos traemos el bloque de memoria a cache
                         cargarACache(dirNumBloqMem, dirBloqCache);
-                        estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                        estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                        estCache[dirBloqCache][ID] = dirNumBloqMem; // Bloque que ocupa ahora esa direccion de cache
+                        estCache[dirBloqCache][EST] = C;            // Estado del bloque que ocupa ahora esa direccion de cache
                     break;
                     case M:
-                        guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Creo que esos son los parámetros correctos. -Érick
+                        guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Guarda el bloque está ahora en cache a su posicion en memoria 
                         cargarACache(dirNumBloqMem, dirBloqCache);
-                        estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-                        estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                        estCache[dirBloqCache][ID] = dirNumBloqMem;         // Bloque que ocupa ahora esa direccion de cache
+                        estCache[dirBloqCache][EST] = C;                    // Estado del bloque que ocupa ahora esa direccion de cache
                     break;
                     case I:
                         // Previsto para los directorios, por el momento no puede estar invalido
@@ -90,14 +89,14 @@ public class Procesador extends Thread {
                 break;
                 case M:
                     guardarEnMemoria(dirNumBloqMem, dirBloqCache);
-                    estCache[dirBloqCache][EST] = C;          // Estado del bloque que ocupa ahora esa direccion de cache
+                    estCache[dirBloqCache][EST] = C;    // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case I:
                     // Previsto para los directorios, por el momento no puede estar invalido
                 break;
             }
         }
-        regs[X] = dcache[dirBloqCache][numPalabra];
+        regs[X] = dcache[dirBloqCache][numPalabra];     // Carga la palabra que se ocupa al registro
     }
     
     //RX, n(RY)
