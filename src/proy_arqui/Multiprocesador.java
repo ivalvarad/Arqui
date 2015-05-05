@@ -65,6 +65,13 @@ public class Multiprocesador {
                 pcActual = pcs.get(i);
                 if((i+1)<pcs.size()) limite = pcs.get(i+1); else limite = instrucciones.size()-pcActual;
                 proc1.procesar(pcActual, limite);
+                try{
+                    this.barrier.await();
+                }catch(Exception e)
+                {
+                    System.out.println("Error");
+                }
+                ciclo++;
                 //est.agregarEstadistica(proc1.verEstado());
             }
         }
