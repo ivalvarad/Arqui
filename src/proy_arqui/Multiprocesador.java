@@ -2,6 +2,7 @@ package proy_arqui;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
 import proy_arqui.CargadorArchivos;
 
 /*
@@ -19,6 +20,8 @@ import proy_arqui.CargadorArchivos;
  */
 public class Multiprocesador {
 
+    public static CyclicBarrier barrier; 
+    
     private Simulacion sim;
     private Estadistica est;
     private Procesador proc1 = new Procesador(this);
@@ -28,6 +31,7 @@ public class Multiprocesador {
     
     public Multiprocesador(Simulacion sim, Estadistica est){
         this.sim = sim;
+        barrier = new CyclicBarrier(1);
     }
     
     public void agregarInstruccion(int num){

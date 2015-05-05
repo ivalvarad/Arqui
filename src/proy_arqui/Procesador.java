@@ -1,8 +1,12 @@
 package proy_arqui;
 
+import java.io.IOException;
+
 public class Procesador extends Thread {
     
     private static Multiprocesador myMp;
+    
+    private int puedoCambiar = 0;
     
     //COLUMNAS EN CACHE
     private final int ID = 0;
@@ -52,6 +56,12 @@ public class Procesador extends Thread {
                     }
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
+                    for(int x=0; x<16; ++x){
+                        try{
+                            Multiprocesador.barrier.await();
+                        } catch(IOException e){};
+                    }
+                    puedoCambiar = 1;
             }else{
                 switch(estadoBloqEnCache){
                     case C:
@@ -254,13 +264,13 @@ public class Procesador extends Thread {
             p2 = myMp.getInstIdx(i+2); 
             p3 = myMp.getInstIdx(i+3);
             procesarInstruccion(cod, p1, p2, p3);
-            //verEstado();
+            verEstado();
         }
     }
     
     public void FIN(){}   
     
-    public String verEstado(){
+    public void verEstado(){
         String estado = "";
         estado += "El PC es: "+ PC + "\n";
         estado += "El IR es: "+ IR + "\n";
@@ -282,8 +292,8 @@ public class Procesador extends Thread {
             estado += dmem[i]+", ";
         }
         estado += "\n";
-        //System.out.println(estado);
-        return estado; 
+        System.out.println(estado);
+        //return estado; 
     }
     
 }
