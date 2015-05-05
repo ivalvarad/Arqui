@@ -74,6 +74,8 @@ public class Multiprocesador {
         Multiprocesador mp = new Multiprocesador(sim, est);
         CargadorArchivos crg = new CargadorArchivos(mp, sim);
         crg.setVisible(true);
+        
+        
     }
  
 }

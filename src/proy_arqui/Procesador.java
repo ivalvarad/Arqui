@@ -70,6 +70,14 @@ public class Procesador extends Thread {
                         cargarACache(dirNumBloqMem, dirBloqCache);
                         estCache[dirBloqCache][ID] = dirNumBloqMem; // Bloque que ocupa ahora esa direccion de cache
                         estCache[dirBloqCache][EST] = C;            // Estado del bloque que ocupa ahora esa direccion de cache
+                        for(int i=0; i<16; i++){
+                            try{
+                                myMp.barrier.await();
+                            }catch(Exception e)
+                            {
+                                System.out.println("Error");
+                            }
+                        }
                     break;
                     case M:
                         guardarEnMemoria(idBloqEnCache*4, idBloqEnCache);   // Guarda el bloque está ahora en cache a su posicion en memoria 
