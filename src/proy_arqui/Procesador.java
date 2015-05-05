@@ -170,6 +170,7 @@ public class Procesador extends Thread {
     public void DSUB(int Y, int Z, int X){
         regs[X]=regs[Y]-regs[Z];
     }
+    public void FIN(){}   
     
     public void procesarInstruccion(int cod, int param1, int param2, int param3){
         IR = PC;
@@ -213,8 +214,6 @@ public class Procesador extends Thread {
             //verEstado();
         }
     }
-    
-    public void FIN(){}   
     
     public String verEstado(){
         String estado = "";

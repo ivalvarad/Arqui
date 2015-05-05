@@ -1,15 +1,7 @@
 package proy_arqui;
-
-
 import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
 import proy_arqui.CargadorArchivos;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author Iva
@@ -25,9 +17,11 @@ public class Multiprocesador {
     private ArrayList<Integer> instrucciones = new ArrayList<Integer>();
     private ArrayList<Integer> pcs = new ArrayList<Integer>();
     private int numHilitos; //cantidad de archivos cargados por el usuario
+    final CyclicBarrier barrier;
     
     public Multiprocesador(Simulacion sim, Estadistica est){
         this.sim = sim;
+        barrier = new CyclicBarrier(1);
     }
     
     public void agregarInstruccion(int num){
@@ -74,11 +68,7 @@ public class Multiprocesador {
         }
     }
     
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        // TODO code application logic here
         Estadistica est = new Estadistica();
         Simulacion sim = new Simulacion(est);
         Multiprocesador mp = new Multiprocesador(sim, est);
