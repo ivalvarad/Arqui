@@ -227,7 +227,7 @@ public class Procesador extends Thread {
             p2 = myMp.getInstIdx(i+2); 
             p3 = myMp.getInstIdx(i+3);
             procesarInstruccion(cod, p1, p2, p3);
-            //verEstado();
+            verEstado();
         }
     }
     
@@ -252,8 +252,9 @@ public class Procesador extends Thread {
         for(int i = 0; i < 32; i++){
             estado += dmem[i]+", ";
         }
+        estado += "Ciclo: "+myMp.ciclo+"\n";
         estado += "\n";
-        //System.out.println(estado);
+        System.out.println(estado);
         return estado; 
     }
     
