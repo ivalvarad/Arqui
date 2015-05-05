@@ -18,10 +18,12 @@ public class Multiprocesador {
     private ArrayList<Integer> pcs = new ArrayList<Integer>();
     private int numHilitos; //cantidad de archivos cargados por el usuario
     final CyclicBarrier barrier;
+    int ciclo; // Contador que lleva el número del ciclo por el que va la ejecución
     
     public Multiprocesador(Simulacion sim, Estadistica est){
         this.sim = sim;
         barrier = new CyclicBarrier(1);
+        this.ciclo = 0;
     }
     
     public void agregarInstruccion(int num){
@@ -74,8 +76,6 @@ public class Multiprocesador {
         Multiprocesador mp = new Multiprocesador(sim, est);
         CargadorArchivos crg = new CargadorArchivos(mp, sim);
         crg.setVisible(true);
-        
-        
     }
  
 }
