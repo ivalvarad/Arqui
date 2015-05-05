@@ -23,13 +23,12 @@ public class Multiprocesador {
     public static CyclicBarrier barrier; 
     
     private Simulacion sim;
-    private Estadistica est;
     private Procesador proc1 = new Procesador(this);
     private ArrayList<Integer> instrucciones = new ArrayList<Integer>();
     private ArrayList<Integer> pcs = new ArrayList<Integer>();
     private int numHilitos; //cantidad de archivos cargados por el usuario
     
-    public Multiprocesador(Simulacion sim, Estadistica est){
+    public Multiprocesador(Simulacion sim){
         this.sim = sim;
         barrier = new CyclicBarrier(1);
     }
@@ -79,20 +78,25 @@ public class Multiprocesador {
                 {
                     System.out.println("Error");
                 }
-                ciclo++;
+                //ciclo++;
                 //est.agregarEstadistica(proc1.verEstado());
+                verEstadisticas();
             }
         }
     }
+    
+    public void verEstadisticas(){
+        sim.setEstadisticas(proc1.verEstado());
+    }
+    
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Estadistica est = new Estadistica();
-        Simulacion sim = new Simulacion(est);
-        Multiprocesador mp = new Multiprocesador(sim, est);
+        Simulacion sim = new Simulacion();
+        Multiprocesador mp = new Multiprocesador(sim);
         CargadorArchivos crg = new CargadorArchivos(mp, sim);
         crg.setVisible(true);
     }

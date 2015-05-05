@@ -57,9 +57,11 @@ public class Procesador extends Thread {
                     estCache[dirBloqCache][ID] = convNumBloqMem; //bloque que ocupa actualmente esa dir de cache
                     estCache[dirBloqCache][EST] = C; //bloque que ocupa actualmente esa dir de cache
                     for(int x=0; x<16; ++x){
+                        /*
                         try{
                             Multiprocesador.barrier.await();
                         } catch(IOException e){};
+                        */
                     }
                     puedoCambiar = 1;
             }else{
@@ -270,7 +272,7 @@ public class Procesador extends Thread {
     
     public void FIN(){}   
     
-    public void verEstado(){
+    public String verEstado(){
         String estado = "";
         estado += "El PC es: "+ PC + "\n";
         estado += "El IR es: "+ IR + "\n";
@@ -291,9 +293,10 @@ public class Procesador extends Thread {
         for(int i = 0; i < 32; i++){
             estado += dmem[i]+", ";
         }
+        //estado += "Ciclo: "+myMp.ciclo+"\n";
         estado += "\n";
         System.out.println(estado);
-        //return estado; 
+        return estado; 
     }
     
 }
