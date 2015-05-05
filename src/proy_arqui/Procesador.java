@@ -99,8 +99,7 @@ public class Procesador extends Thread {
         regs[X] = dcache[dirBloqCache][numPalabra];     // Carga la palabra que se ocupa al registro
     }
     
-    //RX, n(RY)
-    //M(n + (Ry))  Rx
+    // Escribir una palabra
     public void SW(int Y, int X, int n){
         int numByte = regs[Y]+n;                                // Numero del byte que quiero leer de memoria 
         int numBloqMem = Math.floorDiv(numByte,16);             // Indice del bloque en memoria (0-24)
@@ -145,17 +144,16 @@ public class Procesador extends Thread {
                 break;
                 case M:
                     guardarEnMemoria(dirNumBloqMem, dirBloqCache);
-                    //estadoCache[dirBloqCache][ESTADO] = C;        // Estado del bloque que ocupa ahora esa direccion de cache
-                    estCache[dirBloqCache][EST] = M;          // Estado del bloque que ocupa ahora esa direccion de cache
+                    estCache[dirBloqCache][EST] = M;    // Estado del bloque que ocupa ahora esa direccion de cache
                 break;
                 case I:
-                        //previsto para los directorios, por el momento no puede estar invalido
+                    //previsto para los directorios, por el momento no puede estar invalido
                 break;
             }
         }
         dcache[dirBloqCache][numPalabra] = regs[X];
-        estCache[dirBloqCache][ID] = dirNumBloqMem; //bloque que ocupa actualmente esa dir de cache
-        estCache[dirBloqCache][EST] = M; //bloque que ocupa actualmente esa dir de cache
+        estCache[dirBloqCache][ID] = dirNumBloqMem; // Bloque que ocupa ahora esa direccion de cache
+        estCache[dirBloqCache][EST] = M;            // Estado del bloque que ocupa ahora esa direccion de cache
     }
     public void BEQZ(int X, int n){
         if(regs[X]==0) PC+=4*(n-1);
